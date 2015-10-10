@@ -10,7 +10,7 @@ var dx = 2;
 var dy = -2;
 var ballRadius = 10;
 var paddleHeight = 10;
-var paddleWidth = 200;
+var paddleWidth = 75;
 var paddleX = (canvas.width-paddleWidth)/2;
 var rightPressed = false;
 var leftPressed = false;
@@ -34,7 +34,7 @@ function keyUpHandler(e) {
 		rightPressed = false;
 	}
 	else if (e.keyCode === 37) {
-		leftPressed = false;
+		leftPressed = false;3
 	}
 };
 
@@ -74,7 +74,7 @@ function draw() {
 			}
 		}
 		else {
-			alert("You lose!")
+			alert("You lose!");
 			document.location.reload();
 		}
 	}
