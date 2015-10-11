@@ -1,10 +1,10 @@
 canvas {
-	border: 25px solid #959595;
+	border: 25px solid #bdc3c7;
 	border-radius: 10px;
 	display: block;
 	margin: 25% auto;
 }
 
 body {
-	background-color: gray;
+	background-color: #ecf0f1;
 }

@@ -1,6 +1,6 @@
 console.log("linked!")
 
-			// ******************** VARIABLES ******************** //
+			// ******************** CANVAS & PADDLE ******************** //
 
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
@@ -15,10 +15,32 @@ var paddleX = (canvas.width-paddleWidth)/2;
 var rightPressed = false;
 var leftPressed = false;
 
+			// ******************** BRICKS ******************** //
+
+var brickRowCount = 2;
+var brickColumnCount = 5;
+var brickWidth = 75;
+var brickHeight = 20;
+var brickPadding = 10;
+var brickOffsetTop = 30;
+var brickOffsetLeft = 30;
+var bricks = [];
+
+for (i=0; i < brickColumnCount; i++) {
+	bricks[i] = [];
+	for (j=0; j < brickRowCount; j++) {
+		bricks[i][j] = {
+			x: 0,
+			y: 0
+		};
+	}
+}
+
+
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 
-			// ******************** FUNCTIONS ******************** //
+			// ***************** DRAW BALL, DRAW PADDLE ***************** //
 
 function keyDownHandler(e) {
 	if (e.keyCode === 39) {
@@ -38,10 +60,22 @@ function keyUpHandler(e) {
 	}
 };
 
+function collisionDetection() {
+	for (i=0; i < brickColumnCount; i++) {
+		for (j=0; j < brickRowCount; j++) {
+			var b = bricks[i][j];
+			if (x > b.x && x < b.x + brickWidth
+				&& y > b.y && y < brickHeight) {
+					dy = -dy;
+			}
+		}
+	}
+}
+
 function drawBall() {
 	ctx.beginPath();
 	ctx.arc(x, y, ballRadius, 0, Math.PI*2);
-	ctx.fillStyle = '#FFFFFF';
+	ctx.fillStyle = '#1abc9c';
 	ctx.fill();
 	ctx.closePath();
 }
@@ -49,13 +83,30 @@ function drawBall() {
 function drawPaddle() {
 	ctx.beginPath();
 	ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth, paddleHeight);
-	ctx.fillStyle = "#FFFFFF";
+	ctx.fillStyle = "#1abc9c";
 	ctx.fill();
 	ctx.closePath();
 }
 
+function drawBricks() {
+    for(i=0; i < brickColumnCount; i++) {
+        for(j=0; j < brickRowCount; j++) {
+            var brickX = (i*(brickWidth + brickPadding)) + brickOffsetLeft;
+            var brickY = (j*(brickHeight + brickPadding)) + brickOffsetTop;
+            bricks[i][j].x = brickX;
+            bricks[i][j].y = brickY;
+            ctx.beginPath();
+            ctx.rect(brickX, brickY, brickWidth, brickHeight);
+            ctx.fillStyle = "#1abc9c";
+            ctx.fill();
+            ctx.closePath();
+        }
+    }
+}
+
 function draw() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	drawBricks();
 	drawBall();
 	drawPaddle();
 
