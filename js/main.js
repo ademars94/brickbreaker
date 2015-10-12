@@ -28,7 +28,7 @@ var bricks = [];
 
 var score = 0;
 var lives = 3;
-var frameRate = 1000/100;
+var frameRate = 250;
 
 // Sets a brick's 'starting' location
 for (i=0; i < brickColumnCount; i++) {
@@ -154,10 +154,9 @@ function draw() {
 
 	// If the ball hits the bottom, lose a life.  Else if the ball 
 	// hits the paddle, reverse the direction of travel on the y-axis.
-	if (x > paddleX && x < paddleX + paddleWidth) {
-		if (y === $canvas[0].height-paddleHeight) {
-			dy = -dy;
-		}
+	if ((x > paddleX && x < paddleX + paddleWidth)
+	&& (y === $canvas[0].height-paddleHeight)) {
+		dy = -dy;
 	}
 
 	else if (y + dy > $canvas[0].height - ballRadius) {
@@ -191,7 +190,8 @@ function draw() {
 	y += dy;
 };
 
-setInterval(draw, frameRate);
-
+function startGame() {
+	start = window.setInterval(draw, frameRate)
+};
 
 
