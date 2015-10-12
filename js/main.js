@@ -16,6 +16,7 @@ var rightPressed = false;
 var leftPressed = false;
 
 var score = 0;
+var lives = 3;
 
 			// ******************** BRICKS ******************** //
 
