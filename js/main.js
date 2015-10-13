@@ -1,3 +1,4 @@
+
 console.log("linked!")
 
 //********** VARIABLES **********//
@@ -28,9 +29,14 @@ var bricks = [];
 var score = 0;
 var lives = 3;
 var playerOneLives, playerTwoLives;
-var frameRate = 10;
+var frameRate = 8;
 
-//********** LISTENERS **********//
+//********** GLOBAL LISTENERS **********//
+
+
+// $ctx.font = "36px Arial";
+// $ctx.fillStyle = "#1abc9c";
+// $ctx.fillText = "Select a mode!";
 
 $(document).keydown(function(key) {
 	if (key.which === 39) {
@@ -49,6 +55,9 @@ $(document).keyup(function(key) {
 		leftPressed = false;
 	}
 });
+
+$('#onePlayerMode').click(onePlayerMode);
+$('#twoPlayerMode').click(twoPlayerMode);
 
 //***********************************************************************//
 //*************************** ONE PLAYER MODE ***************************//
@@ -95,15 +104,16 @@ function onePlayerMode() {
 		}
 	}
 	
+//***** CANVAS FUNCTIONS *****//
 	function drawScore() {
 		$ctx.font = "16px Arial";
 		$ctx.fillStyle = "#1abc9c";
 		$ctx.fillText("Score: " + score, 8, 20);
 	}
-	
+
 	function drawLives() {
 		$ctx.font = "16px Arial";
-		$ctx.fillStyle = "#1abc9c";
+		$ctx.fillStyle = "#d35400";
 		$ctx.fillText("Lives: " + lives, $canvas[0].width - 65, 20);
 	}
 	
@@ -114,7 +124,6 @@ function onePlayerMode() {
 		$ctx.fill();
 		$ctx.closePath();
 	}
-	
 	function drawPaddle() {
 		$ctx.beginPath();
 		$ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth, paddleHeight);
@@ -122,7 +131,6 @@ function onePlayerMode() {
 		$ctx.fill();
 		$ctx.closePath();
 	}
-	
 	function drawBricks() {
 	    for(i=0; i < brickColumnCount; i++) {
 	        for(j=0; j < brickRowCount; j++) {
@@ -167,7 +175,7 @@ function onePlayerMode() {
 		// If the ball hits the bottom, lose a life.  Else if the ball 
 		// hits the paddle, reverse the direction of travel on the y-axis.
 		if ((x > paddleX && x < paddleX + paddleWidth)
-		&& (y === $canvas[0].height-paddleHeight)) {
+		&& (y === $canvas[0].height - ballRadius - paddleHeight)) {
 			dy = -dy;
 		}
 	
@@ -192,10 +200,10 @@ function onePlayerMode() {
 				// the paddle hits the wall, it will stop.
 	
 		if (rightPressed && paddleX < $canvas[0].width-paddleWidth) {
-			paddleX += 7;
+			paddleX += 5;
 		}
 		else if (leftPressed && paddleX > 0) {
-			paddleX -= 7;
+			paddleX -= 5;
 		}
 	
 		x += dx;
@@ -244,6 +252,14 @@ function twoPlayerMode() {
 	var paddleOneY = ($canvas[0].height-paddleWidth)/2;
 	var paddleTwoY = ($canvas[0].height-paddleWidth)/2;
 
+
+//***** CANVAS FUNCTIONS *****//
+	function drawLives() {
+		$ctx.font = "16px Arial";
+		$ctx.fillStyle = "#d35400";
+		$ctx.fillText("Lives: " + playerOneLives, $canvas[0].width - 80, 30);
+		$ctx.fillText("Lives: " + playerTwoLives, 50, 30);
+	}
 	function drawHalf() {
 		$ctx.beginPath();
 		$ctx.rect($canvas[0].width/2, 0, 2, $canvas[0].height);
@@ -251,7 +267,6 @@ function twoPlayerMode() {
 		$ctx.fill();
 		$ctx.closePath();
 	}
-
 	function drawBall() {
 		$ctx.beginPath();
 		$ctx.arc(x, y, ballRadius, 0, Math.PI*2);
@@ -259,7 +274,6 @@ function twoPlayerMode() {
 		$ctx.fill();
 		$ctx.closePath();
 	}
-
 	function drawPaddleOne() {
 		$ctx.beginPath();
 		$ctx.rect($canvas[0].width - paddleHeight, paddleOneY, paddleHeight, paddleWidth);
@@ -267,7 +281,6 @@ function twoPlayerMode() {
 		$ctx.fill();
 		$ctx.closePath();
 	}
-
 	function drawPaddleTwo() {
 		$ctx.beginPath();
 		$ctx.rect(0, paddleTwoY, paddleHeight, paddleWidth);
@@ -282,8 +295,13 @@ function twoPlayerMode() {
 		drawBall();
 		drawPaddleOne();
 		drawPaddleTwo();
+		drawLives();
 
-		//***** COLLISION DETECTION *****//
+
+//***** COLLISION DETECTION *****//
+//*******************************//
+
+//***** WALL COLLISION DETECTION *****//
 		if (y + dy > $canvas[0].height - ballRadius || y + dy < ballRadius) {
 			dy = -dy;
 		}
@@ -291,44 +309,35 @@ function twoPlayerMode() {
 			dx = -dx;
 		}
 
-
 //***** PADDLE ONE COLLISION DETECTION *****//
-		// debugger;
-		if ((y < paddleOneY && y > paddleOneY + paddleWidth)
-			&& (x === $canvas[0].width - paddleWidth)) {
+		if (y + dy > paddleOneY 
+			&& y + dy < paddleOneY + paddleWidth
+			&& x === $canvas[0].width - ballRadius - paddleHeight) {
+			console.log('paddleOne hit');
 			dx = -dx;
 		}
-		else if (x + dx >= $canvas[0].width - ballRadius) {
+		else if (x === $canvas[0].width - ballRadius) {
 			playerOneLives--;
+			if (playerOneLives < 1) {
+				alert('Player Two wins!');
+				document.location.reload();
+			}
 		}
-
-		// else if (y + dy > $canvas[0].height - ballRadius) {
-		// 	lives --;
-	
-		// 	if (lives < 1) {
-		// 		alert("You lose!");
-		// 		document.location.reload();
-		// 	}
-		// 	else {
-		// 		x = $canvas[0].width/2;
-		// 		y = $canvas[0].height - 30;
-		// 		dx = 2;
-		// 		dy = -2;
-		// 		paddleX = ($canvas[0].width - paddleWidth)/2;
-		// 	}
-		// }
-
-
-
-
 
 //***** PADDLE TWO COLLISION DETECTION *****//
-		if ((y > paddleTwoY && y < paddleTwoY + paddleWidth)
-			&& (x === ballRadius)) {
+		if (y + dy > paddleTwoY 
+			&& y + dy < paddleTwoY + paddleWidth
+			&& x === 0 + ballRadius + paddleHeight) {
+			console.log('paddleTwo hit');
 			dx = -dx;
 		}
-		else if (x + dx < ballRadius) {
+		else if (x === 0 + ballRadius) {
 			playerTwoLives--;
+			if (playerTwoLives < 1) {
+				alert('Player One wins!')
+				document.location.reload();
+			}
+
 		}
 
 //***** PLAYER ONE CONTROLS *****//
@@ -341,10 +350,10 @@ function twoPlayerMode() {
 
 //***** PLAYER TWO CONTROLS *****//
 		if (aPressed && paddleTwoY > 0) {
-			paddleTwoY -= 7;
+			paddleTwoY -= 5;
 		}
 		else if (dPressed && paddleTwoY < $canvas[0].height-paddleWidth) {
-			paddleTwoY += 7;
+			paddleTwoY += 5;
 		}
 
 //***** ANIMATE BALL *****//
@@ -354,8 +363,6 @@ function twoPlayerMode() {
 
 	window.setInterval(draw, frameRate);
 }
-
-twoPlayerMode();
 
 
 

@@ -1,10 +1,37 @@
+body {
+	background-color: #ecf0f1;
+}
+
+#title {
+	font-family: 'Arial';
+	font-size: 72px;
+}
+
+#buttons {
+	position: relative;
+	top: 660px;
+	text-align: center;
+	margin: auto;
+}
+
+input {
+	padding-right: 50px;
+	padding-left: 50px;
+	padding-top: 20px;
+	padding-bottom: 20px;
+	margin: 5px;
+	position: relative;
+	top: 20px;
+	background-color: #bdc3c7;
+	color: #ecf0f1;
+	border: 0;
+	font-size: 16px;
+	font-weight: bold;
+}
+
 canvas {
 	border: 25px solid #bdc3c7;
 	border-radius: 10px;
 	display: block;
 	margin: 25% auto;
-}
-
-body {
-	background-color: #ecf0f1;
 }

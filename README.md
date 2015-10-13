@@ -6,18 +6,19 @@
 
 <br>
 
-
-
-
 ####MVP:
 
 **User will be able to:**
 
-- Move the paddle with the mouse or the arrow keys
+- Interact with paddle using keyboard
 
-- Set game difficulty (speed)
+- Tell when the game is over; Run out of lives or break all of the bricks
 
-- View current score and remaining lives
+**Two users will be able to:**
+
+- See score
+
+- Both manipulate paddle
 
 <br>
 
@@ -32,11 +33,25 @@
 
 ####Ice Box:
 
-**User will be able to:**
+**A single user will be able to:**
+
+- Share scores on social media
+
+- Move the paddle with the mouse or the arrow keys
+
+- Set game difficulty (speed)
+
+- View current score and remaining lives
+
+- Vary the angle of deflection by moving the paddle
+
+**Multiple users can:**
+
+- Set score to play to
 
 - Choose between one player and two player mode
 
-- Share scores on social media
+- Use opposite ends of the keyboard to move paddles
 
 
 
