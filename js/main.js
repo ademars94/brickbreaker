@@ -33,11 +33,6 @@ var frameRate = 6;
 
 //********** GLOBAL LISTENERS **********//
 
-
-// $ctx.font = "36px Arial";
-// $ctx.fillStyle = "#1abc9c";
-// $ctx.fillText = "Select a mode!";
-
 $(document).keydown(function(key) {
 	if (key.which === 39) {
 		rightPressed = true;
@@ -110,13 +105,11 @@ function onePlayerMode() {
 		$ctx.fillStyle = "#1abc9c";
 		$ctx.fillText("Score: " + score, 8, 20);
 	}
-
 	function drawLives() {
 		$ctx.font = "16px Arial";
 		$ctx.fillStyle = "#1abc9c";
 		$ctx.fillText("Lives: " + lives, $canvas[0].width - 65, 20);
 	}
-	
 	function drawBall() {
 		$ctx.beginPath();
 		$ctx.arc(x, y, ballRadius, 0, Math.PI*2);
@@ -342,10 +335,10 @@ function twoPlayerMode() {
 
 //***** PLAYER ONE CONTROLS *****//
 		if (leftPressed && paddleOneY > 0) {
-			paddleOneY -= 7;
+			paddleOneY -= 5;
 		}
 		else if (rightPressed && paddleOneY < $canvas[0].height-paddleWidth) {
-			paddleOneY += 7;
+			paddleOneY += 5;
 		}
 
 //***** PLAYER TWO CONTROLS *****//
