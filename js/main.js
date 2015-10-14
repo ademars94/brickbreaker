@@ -1,4 +1,3 @@
-
 console.log("linked!")
 
 //********** VARIABLES **********//
@@ -8,7 +7,7 @@ var $ctx = $canvas[0].getContext("2d");
 
 var ballRadius = 10;
 var paddleHeight = 12;
-var paddleWidth = 75;
+var paddleWidth = 175;
 var paddleX = ($canvas[0].width-paddleWidth)/2;
 
 var x, y, paddleOneY, paddleTwoY;
@@ -29,7 +28,7 @@ var bricks = [];
 var score = 0;
 var lives = 3;
 var playerOneLives, playerTwoLives;
-var frameRate = 6;
+var frameDuration = 50;
 
 //********** GLOBAL LISTENERS **********//
 
@@ -51,7 +50,7 @@ $(document).keyup(function(key) {
 	}
 });
 
-function reloadPage(){
+function reloadPage() {
 	document.location.reload();
 };
 
@@ -86,10 +85,18 @@ function onePlayerMode() {
 		}
 	}
 
+	function youWin() {
+		window.setTimeout(draw, 100);
+		$('#display').fadeIn(1000);
+		$('#messageScreen').text("You win!");
+		$('#messageScreen').fadeOut(3000);
+		setTimeout(reloadPage, 3000);
+	};
+
 	function collisionDetection() {
-			// Check for brick index and position. If the ball hits 
-			// a brick, change its direction, add a point to the score
-			// and set the brick's status to 0.
+	// Check for brick index and position. If the ball hits 
+	// a brick, change its direction, add a point to the score
+	// and set the brick's status to 0.
 		for (i=0; i < brickColumnCount; i++) {
 			for (j=0; j < brickRowCount; j++) {
 				var b = bricks[i][j];
@@ -99,12 +106,10 @@ function onePlayerMode() {
 							dy = -dy;
 							b.status = 0;
 							score++;
+					// If you break all of the bricks, you win.
 							if (score === brickRowCount*brickColumnCount) {
-								window.setTimeout(draw, 100);
-								$('#display').fadeIn(1000);
-								$('#messageScreen').text("You win!")
-								$('#messageScreen').fadeOut(3000);
-								setTimeout(reloadPage, 3000);
+								debugger;
+								youWin();
 							}
 					}
 				}
@@ -113,16 +118,20 @@ function onePlayerMode() {
 	}
 	
 //***** CANVAS FUNCTIONS *****//
+
+// Draw the score in the top left of the canvas
 	function drawScore() {
 		$ctx.font = "16px Arial";
 		$ctx.fillStyle = "#1abc9c";
 		$ctx.fillText("Score: " + score, 8, 20);
 	}
+// Draw the remaining lives in the top right of the canvas
 	function drawLives() {
 		$ctx.font = "16px Arial";
 		$ctx.fillStyle = "#1abc9c";
 		$ctx.fillText("Lives: " + lives, $canvas[0].width - 65, 20);
 	}
+// Create the ball
 	function drawBall() {
 		$ctx.beginPath();
 		$ctx.arc(x, y, ballRadius, 0, Math.PI*2);
@@ -130,6 +139,7 @@ function onePlayerMode() {
 		$ctx.fill();
 		$ctx.closePath();
 	}
+// Create the paddle
 	function drawPaddle() {
 		$ctx.beginPath();
 		$ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth, paddleHeight);
@@ -137,6 +147,7 @@ function onePlayerMode() {
 		$ctx.fill();
 		$ctx.closePath();
 	}
+// Create the brick field
 	function drawBricks() {
 	    for(i=0; i < brickColumnCount; i++) {
 	        for(j=0; j < brickRowCount; j++) {
@@ -154,7 +165,8 @@ function onePlayerMode() {
 	        }
 	    }
 	}
-	
+// Main game function; runs at a set interval 
+// determined by the frameDuration variable
 	function draw() {
 		$ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
 		drawBricks();
@@ -166,20 +178,20 @@ function onePlayerMode() {
 	
 				// ********** COLLISION DETECTION ********** //
 	
-		// If the ball hits the side, reverse the direction of travel
-		// on the x-axis.
+	// If the ball hits the side, reverse the direction of travel
+	// on the x-axis.
 		if (x + dx > $canvas[0].width-ballRadius || x + dx < ballRadius) {
 			dx = -dx;
 		}
 	
-		// If the ball hits the top, reverse the direction of travel on the 
-		// y-axis
+	// If the ball hits the top, reverse the direction of travel on the 
+	// y-axis
 		if (y + dy < ballRadius) {
 			dy = -dy;
 		}
 	
-		// If the ball hits the bottom, lose a life.  Else if the ball 
-		// hits the paddle, reverse the direction of travel on the y-axis.
+	// If the ball hits the paddle, reverse the direction of travel
+	// on the Y-axis. Else if the ball hits the bottom, lose a life.
 		if ((x > paddleX && x < paddleX + paddleWidth)
 		&& (y === $canvas[0].height - ballRadius - paddleHeight)) {
 				dy = -dy;
@@ -187,14 +199,16 @@ function onePlayerMode() {
 	
 		else if (y + dy > $canvas[0].height - ballRadius) {
 			lives --;
-	
+	// Reloads the game if you lose all of your lives.
 			if (lives < 1) {
 				dy = -dy;
+				window.setTimeout(draw, 100);
 				$('#display').fadeIn(1000);
-				$('#messageScreen').text("You Lose!")
+				$('#messageScreen').text("You lose!");
 				$('#messageScreen').fadeOut(3000);
 				setTimeout(reloadPage, 3000);
 			}
+	// Returns ball and paddle to the starting point.
 			else {
 				x = $canvas[0].width/2;
 				y = $canvas[0].height - 30;
@@ -204,10 +218,9 @@ function onePlayerMode() {
 			}
 		}
 		
-				// If the right arrow is pressed, paddle moves //
-				// right, if left arrow, paddle moves left. If //
-				// the paddle hits the wall, it will stop.
-	
+	// If the right arrow is pressed, paddle moves right, if 
+	// left arrow, paddle moves left. If the paddle hits the 
+	// wall, it will stop.
 		if (rightPressed && paddleX < $canvas[0].width-paddleWidth) {
 			paddleX += 5;
 		}
@@ -218,7 +231,7 @@ function onePlayerMode() {
 		x += dx;
 		y += dy;
 	};
-	window.setInterval(draw, frameRate)
+	window.setInterval(draw, frameDuration)
 }
 
 //***********************************************************************//
@@ -351,7 +364,6 @@ function twoPlayerMode() {
 				$('#messageScreen').text("Player One wins!");
 				setTimeout(reloadPage, 3000);
 			}
-
 		}
 
 //***** PLAYER ONE CONTROLS *****//
@@ -375,7 +387,7 @@ function twoPlayerMode() {
 		y += dy;
 	}
 
-	window.setInterval(draw, frameRate);
+	window.setInterval(draw, frameDuration);
 }
 
 
