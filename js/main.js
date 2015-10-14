@@ -51,7 +51,11 @@ $(document).keyup(function(key) {
 	}
 });
 
-$('#onePlayerMode').click(onePlayerMode);
+$('#onePlayerMode').click(function() {
+	setTimeout(onePlayerMode, 1000);
+	$('#display').fadeOut(1000);
+});
+
 $('#twoPlayerMode').click(twoPlayerMode);
 
 //***********************************************************************//
@@ -90,7 +94,7 @@ function onePlayerMode() {
 							b.status = 0;
 							score++;
 							if (score === brickRowCount*brickColumnCount) {
-								alert("You win!");
+								$('#display').fadeIn(1000);
 								document.location.reload();
 							}
 					}
@@ -176,7 +180,7 @@ function onePlayerMode() {
 			lives --;
 	
 			if (lives < 1) {
-				alert("You lose!");
+				$('#display').fadeIn(1000);
 				document.location.reload();
 			}
 			else {
