@@ -10,15 +10,21 @@
 
 **User will be able to:**
 
-- Interact with paddle using keyboard
+- [x] Interact with paddle using keyboard
 
-- Tell when the game is over; Run out of lives or break all of the bricks
+- [x] Break bricks, adding points for each brick
+
+- [x] Lose a live when the ball hits the ground
+
+- [x] View current score and remaining lives, tell when the game ends
 
 **Two users will be able to:**
 
-- See score
+- [x] Lose lives
 
-- Both manipulate paddle
+- [x] See the score
+
+- [x] Both manipulate paddles with keyboard
 
 <br>
 
@@ -35,23 +41,23 @@
 
 **A single user will be able to:**
 
-- Share scores on social media
+- [ ] Share scores on social media
 
-- Move the paddle with the mouse or the arrow keys
+- [ ] Move the paddle with the mouse
 
-- Set game difficulty (speed)
+- [ ] Set game difficulty (speed)
 
-- View current score and remaining lives
+- [ ] Vary the angle of deflection by moving the paddle
 
-- Vary the angle of deflection by moving the paddle
+- [ ] Play against AI character (Pong mode)
 
 **Multiple users can:**
 
-- Set score to play to
+- [ ] Set score to play to
 
-- Choose between one player and two player mode
+- [ ] Choose between one player and two player mode
 
-- Use opposite ends of the keyboard to move paddles
+- [ ] Use opposite ends of the keyboard to move paddles
 
 
 
