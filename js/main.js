@@ -17,8 +17,8 @@ var dy = -2;
 var rightPressed = false;
 var leftPressed = false;
 
-var brickRowCount = 3;
-var brickColumnCount = 5;
+var brickRowCount = 4;
+var brickColumnCount = 7;
 var brickWidth = 75;
 var brickHeight = 20;
 var brickPadding = 10;
@@ -29,7 +29,7 @@ var bricks = [];
 var score = 0;
 var lives = 3;
 var playerOneLives, playerTwoLives;
-var frameRate = 8;
+var frameRate = 6;
 
 //********** GLOBAL LISTENERS **********//
 
@@ -113,7 +113,7 @@ function onePlayerMode() {
 
 	function drawLives() {
 		$ctx.font = "16px Arial";
-		$ctx.fillStyle = "#d35400";
+		$ctx.fillStyle = "#1abc9c";
 		$ctx.fillText("Lives: " + lives, $canvas[0].width - 65, 20);
 	}
 	
