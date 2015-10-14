@@ -41,13 +41,13 @@
 
 **A single user will be able to:**
 
-- [ ] Share scores on social media
+- [ ] Vary the angle of deflection by moving the paddle
 
 - [ ] Move the paddle with the mouse
 
-- [ ] Set game difficulty (speed)
+- [ ] Advance in levels, increasing ball speed and block rows each time
 
-- [ ] Vary the angle of deflection by moving the paddle
+- [ ] Log their high score
 
 - [ ] Play against AI character (Pong mode)
 

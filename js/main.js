@@ -51,13 +51,19 @@ $(document).keyup(function(key) {
 	}
 });
 
+function reloadPage(){
+	document.location.reload();
+};
+
 $('#onePlayerMode').click(function() {
 	setTimeout(onePlayerMode, 1000);
 	$('#display').fadeOut(1000);
 });
 
-$('#twoPlayerMode').click(twoPlayerMode);
-
+$('#twoPlayerMode').click(function() {
+	setTimeout(twoPlayerMode, 1000);
+	$('#display').fadeOut(1000);
+});
 //***********************************************************************//
 //*************************** ONE PLAYER MODE ***************************//
 //***********************************************************************//
@@ -94,8 +100,11 @@ function onePlayerMode() {
 							b.status = 0;
 							score++;
 							if (score === brickRowCount*brickColumnCount) {
+								window.setTimeout(draw, 100);
 								$('#display').fadeIn(1000);
-								document.location.reload();
+								$('#messageScreen').text("You win!")
+								$('#messageScreen').fadeOut(3000);
+								setTimeout(reloadPage, 3000);
 							}
 					}
 				}
@@ -173,15 +182,18 @@ function onePlayerMode() {
 		// hits the paddle, reverse the direction of travel on the y-axis.
 		if ((x > paddleX && x < paddleX + paddleWidth)
 		&& (y === $canvas[0].height - ballRadius - paddleHeight)) {
-			dy = -dy;
+				dy = -dy;
 		}
 	
 		else if (y + dy > $canvas[0].height - ballRadius) {
 			lives --;
 	
 			if (lives < 1) {
+				dy = -dy;
 				$('#display').fadeIn(1000);
-				document.location.reload();
+				$('#messageScreen').text("You Lose!")
+				$('#messageScreen').fadeOut(3000);
+				setTimeout(reloadPage, 3000);
 			}
 			else {
 				x = $canvas[0].width/2;
@@ -312,12 +324,15 @@ function twoPlayerMode() {
 			&& x === $canvas[0].width - ballRadius - paddleHeight) {
 			console.log('paddleOne hit');
 			dx = -dx;
+
 		}
 		else if (x === $canvas[0].width - ballRadius) {
 			playerOneLives--;
 			if (playerOneLives < 1) {
-				alert('Player Two wins!');
-				document.location.reload();
+				dx = -dx;
+				$('#display').fadeIn(1000);
+				$('#messageScreen').text("Player Two wins!");
+				setTimeout(reloadPage, 3000);
 			}
 		}
 
@@ -331,8 +346,10 @@ function twoPlayerMode() {
 		else if (x === 0 + ballRadius) {
 			playerTwoLives--;
 			if (playerTwoLives < 1) {
-				alert('Player One wins!')
-				document.location.reload();
+				dx = -dx;
+				$('#display').fadeIn(1000);
+				$('#messageScreen').text("Player One wins!");
+				setTimeout(reloadPage, 3000);
 			}
 
 		}

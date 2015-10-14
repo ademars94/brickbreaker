@@ -15,7 +15,7 @@ canvas {
 }
 
 #display {
-	background-color: #ecf0f1;
+	/* Position */
 	width: 640px;
 	height: 480px;
 	position: fixed;
@@ -25,15 +25,26 @@ canvas {
 	margin-left: -320px;
 	display: inline-block;
 	z-index: 10000000;
+	/* Style */
+	color: #bdc3c7;
+	background-color: #ecf0f1;
+	text-align: center;
+	font-size: 100px;
+	font-family: 'Arial';
 }
 
 #buttons {
 	position: fixed;
 	left: 50%;
 	top: 50%;
-	margin-top: 200px;
+	margin-top: -60px;
 	margin-left: -250px;
 	text-align: center;
+}
+
+#messageScreen{
+	position: relative;
+	top: 50px;
 }
 
 input {
@@ -47,6 +58,7 @@ input {
 	border: 0;
 	font-size: 16px;
 	font-weight: bold;
+	font-family: 'Arial';
 }
 
 input:hover {
