@@ -20,11 +20,12 @@
 
 **Two users will be able to:**
 
-- [x] Lose lives
+- [ ] Lose lives
 
-- [x] See the score
+- [ ] See the score
 
-- [x] Both manipulate paddles with keyboard
+- [ ] Both manipulate paddles with keyboard
+
 
 <br>
 
@@ -45,7 +46,9 @@
 
 - [ ] Move the paddle with the mouse
 
-- [ ] Advance in levels, increasing ball speed and block rows each time
+- [X] Interact with a user-friendly interface
+
+- [X] Advance in levels, increasing ball speed and block rows each time
 
 - [ ] Log their high score
 
@@ -55,9 +58,9 @@
 
 - [ ] Set score to play to
 
-- [ ] Choose between one player and two player mode
+- [X] Choose between one player and two player mode
 
-- [ ] Use opposite ends of the keyboard to move paddles
+- [X] Use opposite ends of the keyboard to move paddles
 
 
 
