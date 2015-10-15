@@ -8,7 +8,6 @@ var $ctx = $canvas[0].getContext("2d");
 var ballRadius = 10;
 var paddleHeight = 12;
 var paddleWidth = 100;
-var paddleX;
 
 var x, y, dx, dy, paddleX, paddleOneY, paddleTwoY;
 var rightPressed = false;
@@ -23,11 +22,12 @@ var brickOffsetTop = 30;
 var brickOffsetLeft = 30;
 var bricks = [];
 
-var score = 0;
+var totalScore = 0;
+var currentRoundScore = 0;
 var lives = 3;
 var playerOneLives, playerTwoLives;
-var frameDuration = 5;
-var start;
+var frameDuration = 6;
+var run;
 
 //********** GLOBAL LISTENERS **********//
 
@@ -62,17 +62,19 @@ $('#twoPlayerMode').click(function() {
 	setTimeout(twoPlayerMode, 1000);
 	$('#display').fadeOut(1000);
 });
+
+
 //***********************************************************************//
 //*************************** ONE PLAYER MODE ***************************//
 //***********************************************************************//
 
 var onePlayerMode = {
 
-	//********** Loop through bricks **********//
+	//********** Loop through bricks, adding properties for x, y, and status **********//
 	init: function() {
-		for (i=0; i < brickColumnCount; i++) {
+		for (var i = 0; i < brickColumnCount; i++) {
 			bricks[i] = [];
-			for (j=0; j < brickRowCount; j++) {
+			for (var j = 0; j < brickRowCount; j++) {
 				bricks[i][j] = {
 					x: 0,
 					y: 0,
@@ -90,37 +92,55 @@ var onePlayerMode = {
 	},
 
 	runGame: function() {
-		start = window.setInterval(onePlayerMode.draw, frameDuration);
+		run = window.setInterval(onePlayerMode.draw, frameDuration);
 	},
 
 	stopGame: function() {
-		window.clearInterval(start);
+		window.clearInterval(run);
 	},
 
 	levelUp: function() {
-		onePlayerMode.init();
-		frameDuration--;
+	// The display will fade in without showing the start game buttons.
+		onePlayerMode.stopGame();
+		$ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
+		$('#buttons').hide();
+		$('#display').fadeToggle(500);
+		$('#messageScreen').text("Level Up!");
+		$('#display').fadeToggle(2000, onePlayerMode.init);
 		brickRowCount++;
+		frameDuration--;
+		currentRoundScore = 0;
+	},
+
+	loseGame: function() {
+		onePlayerMode.stopGame();
+		$ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
+		$('#buttons').hide();
+		$('#display').fadeToggle(500);
+		$('#messageScreen').text("You lose!");
+		$('#display').fadeToggle(2000, onePlayerMode.init);
+		lives = 3;
+		
+		currentRoundScore = 0;
+		totalScore = 0;
 	},
 
 	collisionDetection: function() {
 	// Check for brick index and position. If the ball hits 
-	// a brick, change its direction, add a point to the score
-	// and set the brick's status to 0.
-		for (i=0; i < brickColumnCount; i++) {
-			for (j=0; j < brickRowCount; j++) {
+	// a brick: Change ball direction, add a point to the total 
+	// score/round score, set the brick's status to 0.
+		for (var i = 0; i < bricks.length; i++) {
+			for (var j = 0; j < bricks[i].length; j++) {
 				var b = bricks[i][j];
-				if (b. status === 1) {
+				if (b.status === 1) {
 					if (x > b.x && x < b.x + brickWidth
 						&& y > b.y && y < b.y + brickHeight) {
 						dy = -dy;
 						b.status = 0;
-						score++;
-					// If you break all of the bricks, you win.
-						if (score === brickRowCount*brickColumnCount) {
-							$('#display').fadeIn(1000);
-							$('#messageScreen').text("You win!");
-							$('#messageScreen').fadeOut(3000);
+						currentRoundScore++;
+						totalScore++;
+					// If you break all of the bricks, you advance to the next round.
+						if (currentRoundScore === brickRowCount*brickColumnCount) {
 							onePlayerMode.levelUp();
 						}
 					}
@@ -131,11 +151,11 @@ var onePlayerMode = {
 	
 //***** CANVAS FUNCTIONS *****//
 
-// Draw the score in the top left of the canvas
+// Draw the current round score in the top left of the canvas
 	drawScore: function () {
 		$ctx.font = "16px Arial";
 		$ctx.fillStyle = "#1abc9c";
-		$ctx.fillText("Score: " + score, 8, 20);
+		$ctx.fillText("Score: " + totalScore, 8, 20);
 	},
 // Draw the remaining lives in the top right of the canvas
 	drawLives: function () {
@@ -159,10 +179,10 @@ var onePlayerMode = {
 		$ctx.fill();
 		$ctx.closePath();
 	},
-// Create the brick field
+// Draw the brick field
 	drawBricks: function () {
-	    for(i=0; i < brickColumnCount; i++) {
-	        for(j=0; j < brickRowCount; j++) {
+	    for(var i = 0; i < bricks.length; i++) {
+	        for(var j = 0; j < bricks[i].length; j++) {
 	        	if (bricks[i][j].status === 1) {
 	            	var brickX = (i*(brickWidth + brickPadding)) + brickOffsetLeft;
 	            	var brickY = (j*(brickHeight + brickPadding)) + brickOffsetTop;
@@ -203,7 +223,7 @@ var onePlayerMode = {
 	// If the ball hits the paddle, reverse the direction of travel
 	// on the Y-axis. Else if the ball hits the bottom, lose a life.
 		if ((x > paddleX && x < paddleX + paddleWidth)
-		&& (y === $canvas[0].height - ballRadius - paddleHeight)) {
+		&& (y === $canvas[0].height - ballRadius)) {
 				dy = -dy;
 		}
 		else if (y + dy > $canvas[0].height - ballRadius) {
@@ -211,11 +231,7 @@ var onePlayerMode = {
 	// Reloads the game if you lose all of your lives.
 			if (lives < 1) {
 				dy = -dy;
-				window.setTimeout(this.draw, 100);
-				$('#display').fadeIn(1000);
-				$('#messageScreen').text("You lose!");
-				$('#messageScreen').fadeOut(3000);
-				setTimeout(reloadPage, 3000);
+				onePlayerMode.loseGame();
 			}
 	// Returns ball and paddle to the starting point.
 			else {
@@ -356,7 +372,6 @@ function twoPlayerMode() {
 			&& x === $canvas[0].width - ballRadius - paddleHeight) {
 			console.log('paddleOne hit');
 			dx = -dx;
-
 		}
 		else if (x === $canvas[0].width - ballRadius) {
 			playerOneLives--;
@@ -405,6 +420,7 @@ function twoPlayerMode() {
 		x += dx;
 		y += dy;
 	}
+
 
 	window.setInterval(draw, frameDuration);
 }
