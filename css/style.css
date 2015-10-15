@@ -45,6 +45,7 @@ canvas {
 #messageScreen{
 	position: relative;
 	top: 150px;
+	font-size: 100px;
 }
 
 input {

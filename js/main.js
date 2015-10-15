@@ -22,12 +22,15 @@ var brickOffsetTop = 30;
 var brickOffsetLeft = 30;
 var bricks = [];
 
+var currentLevel = 1;
 var totalScore = 0;
 var currentRoundScore = 0;
 var lives = 3;
 var playerOneLives, playerTwoLives;
 var frameDuration = 6;
 var run;
+var paused = false;
+var spacePressed = false;
 
 //********** GLOBAL LISTENERS **********//
 
@@ -49,9 +52,13 @@ $(document).keyup(function(key) {
 	}
 });
 
-function reloadPage() {
-	document.location.reload();
-};
+// Pause the game (wip)
+$(document).keydown(function(key) {
+	if (key.which === 32) {
+		console.log('spacePressed')
+		spacePressed = true;
+	}
+});
 
 $('#onePlayerMode').click(function() {
 	onePlayerMode.init();
@@ -70,7 +77,8 @@ $('#twoPlayerMode').click(function() {
 
 var onePlayerMode = {
 
-	//********** Loop through bricks, adding properties for x, y, and status **********//
+// Loop through bricks, adding properties 
+// for x, y, and status
 	init: function() {
 		for (var i = 0; i < brickColumnCount; i++) {
 			bricks[i] = [];
@@ -82,7 +90,7 @@ var onePlayerMode = {
 				}
 			}
 		}
-		onePlayerMode.stopGame();
+		onePlayerMode.endGame();
 		dx = 2;
 		dy = -2;
 		x = $canvas[0].width/2;
@@ -95,37 +103,40 @@ var onePlayerMode = {
 		run = window.setInterval(onePlayerMode.draw, frameDuration);
 	},
 
-	stopGame: function() {
+	endGame: function() {
 		window.clearInterval(run);
 	},
 
 	levelUp: function() {
 	// The display will fade in without showing the start game buttons.
-		onePlayerMode.stopGame();
+		onePlayerMode.endGame();
 		$ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
+		currentLevel++;
 		$('#buttons').hide();
 		$('#display').fadeToggle(500);
-		$('#messageScreen').text("Level Up!");
+		$('#messageScreen').text("Level " + currentLevel);
 		$('#display').fadeToggle(2000, onePlayerMode.init);
 		brickRowCount++;
-		frameDuration--;
+		frameDuration = frameDuration/1.2;
 		currentRoundScore = 0;
 	},
 
-	loseGame: function() {
-		onePlayerMode.stopGame();
+	gameOver: function() {
+		onePlayerMode.endGame();
 		$ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
 		$('#buttons').hide();
 		$('#display').fadeToggle(500);
-		$('#messageScreen').text("You lose!");
+		$('#messageScreen').text("Game Over");
 		$('#display').fadeToggle(2000, onePlayerMode.init);
+		currentLevel = 1;
+		frameDuration = 6;
+		brickRowCount = 4
 		lives = 3;
-		
 		currentRoundScore = 0;
 		totalScore = 0;
 	},
 
-	collisionDetection: function() {
+	detectCollision: function() {
 	// Check for brick index and position. If the ball hits 
 	// a brick: Change ball direction, add a point to the total 
 	// score/round score, set the brick's status to 0.
@@ -154,14 +165,20 @@ var onePlayerMode = {
 // Draw the current round score in the top left of the canvas
 	drawScore: function () {
 		$ctx.font = "16px Arial";
-		$ctx.fillStyle = "#1abc9c";
+		$ctx.fillStyle = "#bdc3c7";
 		$ctx.fillText("Score: " + totalScore, 8, 20);
 	},
 // Draw the remaining lives in the top right of the canvas
 	drawLives: function () {
 		$ctx.font = "16px Arial";
-		$ctx.fillStyle = "#1abc9c";
+		$ctx.fillStyle = "#bdc3c7";
 		$ctx.fillText("Lives: " + lives, $canvas[0].width - 65, 20);
+	},
+// Draw the current level in the top-middle of the screen
+	drawLevel: function() {
+		$ctx.font = "16px Arial";
+		$ctx.fillStyle = "#bdc3c7";
+		$ctx.fillText("Level: " + currentLevel, $canvas[0].width/2 - 25, 20);
 	},
 // Create the ball
 	drawBall: function () {
@@ -206,7 +223,8 @@ var onePlayerMode = {
 		onePlayerMode.drawPaddle();
 		onePlayerMode.drawScore();
 		onePlayerMode.drawLives();
-		onePlayerMode.collisionDetection();
+		onePlayerMode.drawLevel();
+		onePlayerMode.detectCollision();
 	
 	// ********** COLLISION DETECTION ********** //
 	
@@ -231,7 +249,7 @@ var onePlayerMode = {
 	// Reloads the game if you lose all of your lives.
 			if (lives < 1) {
 				dy = -dy;
-				onePlayerMode.loseGame();
+				onePlayerMode.gameOver();
 			}
 	// Returns ball and paddle to the starting point.
 			else {
@@ -250,6 +268,15 @@ var onePlayerMode = {
 		}
 		else if (leftPressed && paddleX > 0) {
 			paddleX -= 5;
+		}
+	// Pause the game (wip)
+		if (paused === false && spacePressed) {
+			window.clearInterval(run);
+			paused === true;
+		}
+		else if (paused === true && spacePressed) {
+			window.setInterval(onePlayerMode.draw, frameDuration);
+			paused === false;
 		}
 	
 		x += dx;
