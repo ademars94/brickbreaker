@@ -1,18 +1,22 @@
-console.log("linked!")
+console.log("Great job!")
 
-//********** VARIABLES **********//
+//*****************************************************//
+//********************* VARIABLES *********************//
+//*****************************************************//
 
+// Canvas and context:
 var $canvas = $("#canvas");
 var $ctx = $canvas[0].getContext("2d");
 
+// Ball and paddle settings:
+var x, y, dx, dy, paddleX, paddleOneY, paddleTwoY;
 var ballRadius = 10;
 var paddleHeight = 12;
 var paddleWidth = 100;
-
-var x, y, dx, dy, paddleX, paddleOneY, paddleTwoY;
 var rightPressed = false;
 var leftPressed = false;
 
+// Brickfield settings:
 var brickRowCount = 4;
 var brickColumnCount = 7;
 var brickWidth = 75;
@@ -22,6 +26,7 @@ var brickOffsetTop = 30;
 var brickOffsetLeft = 30;
 var bricks = [];
 
+// Starting game parameters:
 var currentLevel = 1;
 var totalScore = 0;
 var currentRoundScore = 0;
@@ -29,12 +34,15 @@ var lives = 3;
 var playerOneLives, playerTwoLives;
 var frameDuration = 6;
 var run;
-var paused = false;
+var gamePaused = false;
 var spacePressed = false;
 
-//********** GLOBAL LISTENERS **********//
+//*****************************************************//
+//****************** EVENT LISTENERS ******************//
+//*****************************************************//
 
 $(document).keydown(function(key) {
+// Detect when the user has pressed an arrow key.
 	if (key.which === 39) {
 		rightPressed = true;
 	}
@@ -44,6 +52,7 @@ $(document).keydown(function(key) {
 });
 
 $(document).keyup(function(key) {
+// Detect when the user has released an arrow key.
 	if (key.which === 39) {
 		rightPressed = false;
 	}
@@ -52,34 +61,55 @@ $(document).keyup(function(key) {
 	}
 });
 
-// Pause the game (wip)
 $(document).keydown(function(key) {
-	if (key.which === 32) {
-		console.log('spacePressed')
-		spacePressed = true;
+// Detect when the user has pressed the A or D keys.
+	if (key.which === 68) {
+		dPressed = true;
+	}
+	else if (key.which === 65) {
+		aPressed = true;
 	}
 });
 
+$(document).keyup(function(key) {
+// Detect when the user has released the A or D keys.
+	if (key.which === 68) {
+		dPressed = false;
+	}
+	else if (key.which === 65) {
+		aPressed = false;
+	}
+});
+
+$(document).keydown(function(key) {
+// The pauseGame function runs when spacebar is pressed.
+	if (key.which === 32) {
+		onePlayerMode.pauseGame();
+	}
+}); 
+
 $('#onePlayerMode').click(function() {
-	onePlayerMode.init();
-	$('#display').fadeOut(1000);
+// Button starts a one player game when clicked.
+	onePlayerMode.draw();
+	$('#display').fadeOut(1000, onePlayerMode.init);
 });
 
 $('#twoPlayerMode').click(function() {
+// Button starts a two player game when clicked.
 	setTimeout(twoPlayerMode, 1000);
 	$('#display').fadeOut(1000);
 });
 
 
-//***********************************************************************//
-//*************************** ONE PLAYER MODE ***************************//
-//***********************************************************************//
+//*****************************************************//
+//****************** ONE PLAYER MODE ******************//
+//*****************************************************//
 
 var onePlayerMode = {
 
-// Loop through bricks, adding properties 
-// for x, y, and status
 	init: function() {
+// Initializes the canvas for a new game or level. 
+// The canvas will load with the game paused.
 		for (var i = 0; i < brickColumnCount; i++) {
 			bricks[i] = [];
 			for (var j = 0; j < brickRowCount; j++) {
@@ -97,18 +127,45 @@ var onePlayerMode = {
 		y = $canvas[0].height-30;
 		paddleX = ($canvas[0].width-paddleWidth)/2;
 		onePlayerMode.runGame();
+		onePlayerMode.draw();
 	},
 
 	runGame: function() {
+// Sets the interval at which to run the draw function.
 		run = window.setInterval(onePlayerMode.draw, frameDuration);
 	},
 
 	endGame: function() {
+// Stops the game in it's current frame.
 		window.clearInterval(run);
 	},
 
+	pauseGame: function() {
+// If the game is running and spacebar is pressed,
+// pause the game.  If the game is already paused
+// and spacebar is pressed, run the game.
+		if (gamePaused === false) {
+			window.clearInterval(run);
+			gamePaused = true;
+			$('#buttons').hide();
+			$('#display').fadeIn(100);
+			$('#display').css("backgroundColor", "none")
+			$('#messageScreen').text("Pause");
+		}
+		else if (gamePaused) {
+			run = window.setInterval(onePlayerMode.draw, frameDuration);
+			gamePaused = false;
+			$('#buttons').hide();
+			$('#display').fadeOut(100);
+		}
+	},
+
 	levelUp: function() {
-	// The display will fade in without showing the start game buttons.
+// If the user breaks all of the bricks, they will
+// advance in level, adding a new row of bricks and 
+// increasing the game's speed with each level.
+// The display will fade in, showing the next level
+// instead of the menu buttons.
 		onePlayerMode.endGame();
 		$ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
 		currentLevel++;
@@ -117,16 +174,21 @@ var onePlayerMode = {
 		$('#messageScreen').text("Level " + currentLevel);
 		$('#display').fadeToggle(2000, onePlayerMode.init);
 		brickRowCount++;
+		lives++;
 		frameDuration = frameDuration/1.2;
 		currentRoundScore = 0;
 	},
 
 	gameOver: function() {
+// End the animation, clear the canvas, reset all
+// values to their initial state, reinitialize the game.
 		onePlayerMode.endGame();
 		$ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
 		$('#buttons').hide();
-		$('#display').fadeToggle(500);
+		$('#messageScreen').hide();
+		$('#display').show();
 		$('#messageScreen').text("Game Over");
+		$('#messageScreen').fadeIn(500)
 		$('#display').fadeToggle(2000, onePlayerMode.init);
 		currentLevel = 1;
 		frameDuration = 6;
@@ -149,7 +211,7 @@ var onePlayerMode = {
 						dy = -dy;
 						b.status = 0;
 						currentRoundScore++;
-						totalScore++;
+						totalScore += 10;
 					// If you break all of the bricks, you advance to the next round.
 						if (currentRoundScore === brickRowCount*brickColumnCount) {
 							onePlayerMode.levelUp();
@@ -160,25 +222,25 @@ var onePlayerMode = {
 		}
 	},
 	
-//***** CANVAS FUNCTIONS *****//
+//***************** CANVAS FUNCTIONS *****************//
 
 // Draw the current round score in the top left of the canvas
 	drawScore: function () {
-		$ctx.font = "16px Arial";
+		$ctx.font = "18px Veranda, Geneva, sans-serif";
 		$ctx.fillStyle = "#bdc3c7";
-		$ctx.fillText("Score: " + totalScore, 8, 20);
+		$ctx.fillText("Score: " + totalScore, 8, 22);
 	},
 // Draw the remaining lives in the top right of the canvas
 	drawLives: function () {
-		$ctx.font = "16px Arial";
+		$ctx.font = "18px Veranda, Geneva, sans-serif";
 		$ctx.fillStyle = "#bdc3c7";
-		$ctx.fillText("Lives: " + lives, $canvas[0].width - 65, 20);
+		$ctx.fillText("Lives: " + lives, $canvas[0].width - 75, 22);
 	},
 // Draw the current level in the top-middle of the screen
 	drawLevel: function() {
-		$ctx.font = "16px Arial";
+		$ctx.font = "18px Veranda, Geneva, sans-serif";
 		$ctx.fillStyle = "#bdc3c7";
-		$ctx.fillText("Level: " + currentLevel, $canvas[0].width/2 - 25, 20);
+		$ctx.fillText("Level: " + currentLevel, $canvas[0].width/2 - 28, 22);
 	},
 // Create the ball
 	drawBall: function () {
@@ -270,13 +332,13 @@ var onePlayerMode = {
 			paddleX -= 5;
 		}
 	// Pause the game (wip)
-		if (paused === false && spacePressed) {
+		if (gamePaused === false && spacePressed) {
 			window.clearInterval(run);
-			paused === true;
+			gamePaused === true;
 		}
-		else if (paused === true && spacePressed) {
+		else if (gamePaused === true && spacePressed) {
 			window.setInterval(onePlayerMode.draw, frameDuration);
-			paused === false;
+			gamePaused === false;
 		}
 	
 		x += dx;
@@ -299,8 +361,7 @@ var onePlayerMode = {
 //***********************************************************************//
 //*************************** TWO PLAYER MODE ***************************//
 //***********************************************************************//
-
-function twoPlayerMode() {
+var twoPlayerMode = {
 
 	var dPressed = false;
 	var aPressed = false;
@@ -313,24 +374,6 @@ function twoPlayerMode() {
 
 //********** LISTENERS **********//
 
-	$(document).keydown(function(key) {
-		if (key.which === 68) {
-			dPressed = true;
-		}
-		else if (key.which === 65) {
-			aPressed = true;
-		}
-	});
-
-	$(document).keyup(function(key) {
-		if (key.which === 68) {
-			dPressed = false;
-		}
-		else if (key.which === 65) {
-			aPressed = false;
-		}
-	});
-
 	var x = $canvas[0].width/2;
 	var y = $canvas[0].height/2;
 	var paddleOneY = ($canvas[0].height-paddleWidth)/2;
@@ -339,7 +382,7 @@ function twoPlayerMode() {
 
 //***** CANVAS FUNCTIONS *****//
 	function drawLives() {
-		$ctx.font = "16px Arial";
+		$ctx.font = "18px Veranda, Geneva, sans-serif";
 		$ctx.fillStyle = "#d35400";
 		$ctx.fillText("Lives: " + playerOneLives, $canvas[0].width - 80, 30);
 		$ctx.fillText("Lives: " + playerTwoLives, 50, 30);
