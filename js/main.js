@@ -91,7 +91,7 @@ $(document).keydown(function(key) {
 	if (key.which === 32) {
 		onePlayerMode.pauseGame();
 	}
-}); 
+});
 
 $('#onePlayerMode').click(function() {
 // Button starts a one player game when clicked.
@@ -102,6 +102,8 @@ $('#onePlayerMode').click(function() {
 $('#twoPlayerMode').click(function() {
 // Button starts a two player game when clicked.
 	twoPlayerMode.draw();
+	playerOneLives = 3;
+	playerTwoLives = 3;
 	$('#display').fadeOut(1000, twoPlayerMode.init);
 });
 
@@ -159,7 +161,6 @@ var onePlayerMode = {
 		else if (gamePaused) {
 			run = window.setInterval(onePlayerMode.draw, frameDuration);
 			gamePaused = false;
-			$('#buttons').hide();
 			$('#display').fadeOut(100);
 		}
 	},
@@ -186,15 +187,15 @@ var onePlayerMode = {
 // state, reinitialize the game.
 		onePlayerMode.endGame();
 		$ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
-		$('#buttons').hide();
+		$('#buttons').show();
 		$('#messageScreen').hide();
 		$('#display').show();
 		$('#messageScreen').text("Game Over");
 		$('#messageScreen').fadeIn(500)
-		$('#display').fadeToggle(2000, onePlayerMode.init);
+		// $('#display').fadeToggle(2000, onePlayerMode.init);
 		currentLevel = 1;
 		frameDuration = 6;
-		brickRowCount = 4
+		brickRowCount = 4;
 		lives = 3;
 		currentRoundScore = 0;
 		totalScore = 0;
@@ -223,7 +224,7 @@ var onePlayerMode = {
 			}
 		}
 	},
-	
+
 //********************* FUNCTIONS *********************//
 
 // Draw the current round score in the top left of the canvas
@@ -350,8 +351,6 @@ var onePlayerMode = {
 	}	
 }
 
-
-
 //***********************************************************************//
 //*************************** TWO PLAYER MODE ***************************//
 //***********************************************************************//
@@ -372,7 +371,12 @@ var twoPlayerMode = {
 		paddleOneY = ($canvas[0].height-paddleWidth)/2;
 		paddleTwoY = ($canvas[0].height-paddleWidth)/2;
 		twoPlayerMode.runGame();
-		twoPlayerMode.draw();
+	},
+
+	resetLives: function() {
+		playerOneLives = 3;
+		playerTwoLives = 3;
+		twoPlayerMode.endGame();
 	},
 
 	runGame: function() {
@@ -385,25 +389,6 @@ var twoPlayerMode = {
 		window.clearInterval(run);
 	},
 
-	pauseGame: function() {
-// If the game is running and spacebar is pressed,
-// pause the game.  If the game is already paused
-// and spacebar is pressed, run the game.
-		if (gamePaused === false) {
-			window.clearInterval(run);
-			gamePaused = true;
-			$('#buttons').hide();
-			$('#display').fadeIn(100);
-			$('#messageScreen').text("Pause");
-		}
-		else if (gamePaused) {
-			run = window.setInterval(onePlayerMode.draw, frameDuration);
-			gamePaused = false;
-			$('#buttons').hide();
-			$('#display').fadeOut(100);
-		}
-	},
-
 	drawLives: function() {
 		$ctx.font = "18px Veranda, Geneva, sans-serif";
 		$ctx.fillStyle = "#bdc3c7";
@@ -412,7 +397,7 @@ var twoPlayerMode = {
 	},
 	drawHalf: function() {
 		$ctx.beginPath();
-		$ctx.rect($canvas[0].width/2, 0, 2, $canvas[0].height);
+		$ctx.rect($canvas[0].width/2, 0, 4, $canvas[0].height);
 		$ctx.fillStyle = '#bdc3c7';
 		$ctx.fill();
 		$ctx.closePath();
@@ -420,7 +405,7 @@ var twoPlayerMode = {
 	drawBall: function() {
 		$ctx.beginPath();
 		$ctx.arc(x, y, ballRadius, 0, Math.PI*2);
-		$ctx.fillStyle = '#1abc9c';
+		$ctx.fillStyle = '#555555';
 		$ctx.fill();
 		$ctx.closePath();
 	},
@@ -434,7 +419,7 @@ var twoPlayerMode = {
 	drawPaddleTwo: function() {
 		$ctx.beginPath();
 		$ctx.rect(0, paddleTwoY, paddleHeight, paddleWidth);
-		$ctx.fillStyle = '#1abc9c';
+		$ctx.fillStyle = '#e74c3c';
 		$ctx.fill();
 		$ctx.closePath();
 	},
@@ -450,75 +435,53 @@ var twoPlayerMode = {
 		if (y + dy > $canvas[0].height - ballRadius || y + dy < ballRadius) {
 			dy = -dy;
 		}
-		if ((x + dx > $canvas[0].width - ballRadius) || (x + dx < ballRadius)) {
-			dx = -dx;
-		}
 
-//***** PADDLE ONE COLLISION DETECTION *****//
-		if (y > paddleOneY 
-			&& y < paddleOneY + paddleWidth
-			&& x === $canvas[0].width - ballRadius) {
+// paddleOne collision detection
+		if ((y > paddleOneY 
+			&& y < paddleOneY + paddleWidth)
+			&& (x === $canvas[0].width - ballRadius)) {
 			dx = -dx;
 			console.log('paddleOne hit');
 		}
 		else if (x + dx > $canvas[0].width - ballRadius) {
 			playerOneLives--;
+			twoPlayerMode.init();
 			if (playerOneLives < 1) {
-				dx = -dx;
-				$('#display').fadeIn(1000);
+				$ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
+				twoPlayerMode.endGame();
+				$('#display').fadeIn(500);
 				$('#messageScreen').text("Player Two wins!");
-				setTimeout(reloadPage, 3000);
 			}
 		}
 
-		// if ((x > paddleX && x < paddleX + paddleWidth)
-		// && (y === $canvas[0].height - ballRadius)) {
-		// 		dy = -dy;
-		// }
-		// else if (y + dy > $canvas[0].height - ballRadius) {
-		// 	lives --;
-		// 	if (lives < 1) {
-		// // Reloads the game if you lose all of your lives.
-		// 		dy = -dy;
-		// 		onePlayerMode.gameOver();
-		// 	}
-
-		// 	else {
-		// // Returns ball and paddle to the starting point.
-		// 		x = $canvas[0].width/2;
-		// 		y = $canvas[0].height - 30;
-		// 		dx = 2;
-		// 		dy = -2;
-		// 		paddleX = ($canvas[0].width - paddleWidth)/2;
-		// 	}
-		// }
-
-//***** PADDLE TWO COLLISION DETECTION *****//
-		if (y > paddleTwoY && y < paddleTwoY + paddleWidth
-			&& x === 0 + ballRadius) {
+// paddleTwo collision detection
+		if ((y > paddleTwoY 
+		&& y < paddleTwoY + paddleWidth)
+		&& (x === 0 + ballRadius)) {
 			console.log('paddleTwo hit');
 			dx = -dx;
 		}
-		else if (x + dx > 0 + ballRadius) {
+		else if (x + dx < 0 + ballRadius) {
 			playerTwoLives--;
+			twoPlayerMode.init();
 			if (playerTwoLives < 1) {
 				dx = -dx;
-				$('#display').fadeIn(1000);
+				$ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
+				twoPlayerMode.endGame();
+				$('#display').fadeIn(500);
 				$('#messageScreen').text("Player One wins!");
-				setTimeout(reloadPage, 3000);
+
 			}
 		}
 
 
-//***** PLAYER ONE CONTROLS *****//
+// Controls
 		if (leftPressed && paddleOneY > 0) {
 			paddleOneY -= 5;
 		}
 		else if (rightPressed && paddleOneY < $canvas[0].height-paddleWidth) {
 			paddleOneY += 5;
 		}
-
-//***** PLAYER TWO CONTROLS *****//
 		if (aPressed && paddleTwoY > 0) {
 			paddleTwoY -= 5;
 		}
@@ -526,7 +489,7 @@ var twoPlayerMode = {
 			paddleTwoY += 5;
 		}
 
-//***** ANIMATE BALL *****//
+// Animate ball
 		x += dx;
 		y += dy;
 	}

@@ -22,9 +22,9 @@
 
 - [ ] Lose lives
 
-- [ ] See the score
+- [x] See remaining lives
 
-- [ ] Both manipulate paddles with keyboard
+- [x] Both manipulate paddles with keyboard
 
 
 <br>
