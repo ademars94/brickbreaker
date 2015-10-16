@@ -1,4 +1,4 @@
-console.log("Great job!")
+console.log("Great job!");
 
 //*****************************************************//
 //********************* VARIABLES *********************//
@@ -31,11 +31,16 @@ var currentLevel = 1;
 var totalScore = 0;
 var currentRoundScore = 0;
 var lives = 3;
-var playerOneLives, playerTwoLives;
 var frameDuration = 6;
 var run;
 var gamePaused = false;
 var spacePressed = false;
+
+// Two player specific variables
+var dPressed = false;
+var aPressed = false;
+var playerOneLives = 3;
+var playerTwoLives = 3;
 
 //*****************************************************//
 //****************** EVENT LISTENERS ******************//
@@ -96,8 +101,8 @@ $('#onePlayerMode').click(function() {
 
 $('#twoPlayerMode').click(function() {
 // Button starts a two player game when clicked.
-	setTimeout(twoPlayerMode, 1000);
-	$('#display').fadeOut(1000);
+	twoPlayerMode.draw();
+	$('#display').fadeOut(1000, twoPlayerMode.init);
 });
 
 
@@ -149,7 +154,6 @@ var onePlayerMode = {
 			gamePaused = true;
 			$('#buttons').hide();
 			$('#display').fadeIn(100);
-			$('#display').css("backgroundColor", "none")
 			$('#messageScreen').text("Pause");
 		}
 		else if (gamePaused) {
@@ -161,11 +165,9 @@ var onePlayerMode = {
 	},
 
 	levelUp: function() {
-// If the user breaks all of the bricks, they will
-// advance in level, adding a new row of bricks and 
-// increasing the game's speed with each level.
-// The display will fade in, showing the next level
-// instead of the menu buttons.
+// If the user breaks all of the bricks, they will advance in level, adding
+// a new row of bricks and increasing the game's speed with each level. The 
+// display will fade in, showing the next level instead of the menu buttons.
 		onePlayerMode.endGame();
 		$ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
 		currentLevel++;
@@ -180,8 +182,8 @@ var onePlayerMode = {
 	},
 
 	gameOver: function() {
-// End the animation, clear the canvas, reset all
-// values to their initial state, reinitialize the game.
+// End the animation, clear the canvas, reset all values to their initial
+// state, reinitialize the game.
 		onePlayerMode.endGame();
 		$ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
 		$('#buttons').hide();
@@ -199,9 +201,9 @@ var onePlayerMode = {
 	},
 
 	detectCollision: function() {
-	// Check for brick index and position. If the ball hits 
-	// a brick: Change ball direction, add a point to the total 
-	// score/round score, set the brick's status to 0.
+// Check for brick index and position. If the ball hits a brick: Change 
+// ball direction, add a point to the total score/round score, set the
+// brick's status to 0.
 		for (var i = 0; i < bricks.length; i++) {
 			for (var j = 0; j < bricks[i].length; j++) {
 				var b = bricks[i][j];
@@ -222,7 +224,7 @@ var onePlayerMode = {
 		}
 	},
 	
-//***************** CANVAS FUNCTIONS *****************//
+//********************* FUNCTIONS *********************//
 
 // Draw the current round score in the top left of the canvas
 	drawScore: function () {
@@ -276,9 +278,10 @@ var onePlayerMode = {
 	        }
 	    }
 	},
-// Main game function; runs at a set interval 
-// determined by the frameDuration variable
+
 	draw: function () {
+// Runs continuously at a set interval which is determined by the 
+// frameDuration variable. Makes the game work.
 		$ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
 		onePlayerMode.drawBricks();
 		onePlayerMode.drawBall();
@@ -287,9 +290,9 @@ var onePlayerMode = {
 		onePlayerMode.drawLives();
 		onePlayerMode.drawLevel();
 		onePlayerMode.detectCollision();
-	
-	// ********** COLLISION DETECTION ********** //
-	
+ 
+// ********** COLLISION DETECTION ********** //
+
 	// If the ball hits the side, reverse the direction of travel
 	// on the x-axis.
 		if (x + dx > $canvas[0].width-ballRadius || x + dx < ballRadius) {
@@ -300,21 +303,22 @@ var onePlayerMode = {
 		if (y + dy < ballRadius) {
 			dy = -dy;
 		}
-	// If the ball hits the paddle, reverse the direction of travel
-	// on the Y-axis. Else if the ball hits the bottom, lose a life.
+	// If the ball hits the paddle, reverse the direction of travel on the
+	// Y-axis. Else if the ball hits the bottom, lose a life.
 		if ((x > paddleX && x < paddleX + paddleWidth)
 		&& (y === $canvas[0].height - ballRadius)) {
 				dy = -dy;
 		}
 		else if (y + dy > $canvas[0].height - ballRadius) {
 			lives --;
-	// Reloads the game if you lose all of your lives.
 			if (lives < 1) {
+		// Reloads the game if you lose all of your lives.
 				dy = -dy;
 				onePlayerMode.gameOver();
 			}
-	// Returns ball and paddle to the starting point.
+
 			else {
+		// Returns ball and paddle to the starting point.
 				x = $canvas[0].width/2;
 				y = $canvas[0].height - 30;
 				dx = 2;
@@ -322,16 +326,17 @@ var onePlayerMode = {
 				paddleX = ($canvas[0].width - paddleWidth)/2;
 			}
 		}
-	// If the right arrow is pressed, paddle moves right, if 
-	// left arrow, paddle moves left. If the paddle hits the 
-	// wall, it will stop. 
+
+	// If the right arrow is pressed, paddle moves right, if left arrow,
+	// paddle moves left. If the paddle hits the wall, it will stop. 
 		if (rightPressed && paddleX < $canvas[0].width-paddleWidth) {
 			paddleX += 5;
 		}
 		else if (leftPressed && paddleX > 0) {
 			paddleX -= 5;
 		}
-	// Pause the game (wip)
+
+	// Pause the game, unpause the game.
 		if (gamePaused === false && spacePressed) {
 			window.clearInterval(run);
 			gamePaused === true;
@@ -340,95 +345,108 @@ var onePlayerMode = {
 			window.setInterval(onePlayerMode.draw, frameDuration);
 			gamePaused === false;
 		}
-	
 		x += dx;
 		y += dy;
 	}	
-	// window.setInterval(draw, frameDuration)
 }
-
-
-
-
-
-
-
-
-
 
 
 
 //***********************************************************************//
 //*************************** TWO PLAYER MODE ***************************//
 //***********************************************************************//
+
+
+
 var twoPlayerMode = {
 
-	var dPressed = false;
-	var aPressed = false;
+//********************* FUNCTIONS *********************//
+	
+	init: function() {
+		twoPlayerMode.endGame();
+		dx = 2;
+		dy = -2;
+		x = $canvas[0].width/2;
+		y = $canvas[0].height/2;
+		frameDuration = 3;
+		paddleOneY = ($canvas[0].height-paddleWidth)/2;
+		paddleTwoY = ($canvas[0].height-paddleWidth)/2;
+		twoPlayerMode.runGame();
+		twoPlayerMode.draw();
+	},
 
-	var x = $canvas[0].width/2;
-	var y = $canvas[0].height-30;
+	runGame: function() {
+// Sets the interval at which to run the draw function.
+		run = window.setInterval(twoPlayerMode.draw, frameDuration);
+	},
 
-	playerOneLives = 3;
-	playerTwoLives = 3;
+	endGame: function() {
+// Stops the game in it's current frame.
+		window.clearInterval(run);
+	},
 
-//********** LISTENERS **********//
+	pauseGame: function() {
+// If the game is running and spacebar is pressed,
+// pause the game.  If the game is already paused
+// and spacebar is pressed, run the game.
+		if (gamePaused === false) {
+			window.clearInterval(run);
+			gamePaused = true;
+			$('#buttons').hide();
+			$('#display').fadeIn(100);
+			$('#messageScreen').text("Pause");
+		}
+		else if (gamePaused) {
+			run = window.setInterval(onePlayerMode.draw, frameDuration);
+			gamePaused = false;
+			$('#buttons').hide();
+			$('#display').fadeOut(100);
+		}
+	},
 
-	var x = $canvas[0].width/2;
-	var y = $canvas[0].height/2;
-	var paddleOneY = ($canvas[0].height-paddleWidth)/2;
-	var paddleTwoY = ($canvas[0].height-paddleWidth)/2;
-
-
-//***** CANVAS FUNCTIONS *****//
-	function drawLives() {
+	drawLives: function() {
 		$ctx.font = "18px Veranda, Geneva, sans-serif";
-		$ctx.fillStyle = "#d35400";
+		$ctx.fillStyle = "#bdc3c7";
 		$ctx.fillText("Lives: " + playerOneLives, $canvas[0].width - 80, 30);
 		$ctx.fillText("Lives: " + playerTwoLives, 50, 30);
-	}
-	function drawHalf() {
+	},
+	drawHalf: function() {
 		$ctx.beginPath();
 		$ctx.rect($canvas[0].width/2, 0, 2, $canvas[0].height);
-		$ctx.fillStyle = '#d35400';
+		$ctx.fillStyle = '#bdc3c7';
 		$ctx.fill();
 		$ctx.closePath();
-	}
-	function drawBall() {
+	},
+	drawBall: function() {
 		$ctx.beginPath();
 		$ctx.arc(x, y, ballRadius, 0, Math.PI*2);
-		$ctx.fillStyle = '#d35400';
+		$ctx.fillStyle = '#1abc9c';
 		$ctx.fill();
 		$ctx.closePath();
-	}
-	function drawPaddleOne() {
+	},
+	drawPaddleOne: function() {
 		$ctx.beginPath();
 		$ctx.rect($canvas[0].width - paddleHeight, paddleOneY, paddleHeight, paddleWidth);
-		$ctx.fillStyle = '#d35400';
+		$ctx.fillStyle = '#1abc9c';
 		$ctx.fill();
 		$ctx.closePath();
-	}
-	function drawPaddleTwo() {
+	},
+	drawPaddleTwo: function() {
 		$ctx.beginPath();
 		$ctx.rect(0, paddleTwoY, paddleHeight, paddleWidth);
-		$ctx.fillStyle = '#d35400';
+		$ctx.fillStyle = '#1abc9c';
 		$ctx.fill();
 		$ctx.closePath();
-	}
-
-	function draw() {
+	},
+	draw: function() {
 		$ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
-		drawHalf();
-		drawBall();
-		drawPaddleOne();
-		drawPaddleTwo();
-		drawLives();
+		twoPlayerMode.drawHalf();
+		twoPlayerMode.drawBall();
+		twoPlayerMode.drawPaddleOne();
+		twoPlayerMode.drawPaddleTwo();
+		twoPlayerMode.drawLives();
 
 
-//***** COLLISION DETECTION *****//
-//*******************************//
-
-//***** WALL COLLISION DETECTION *****//
 		if (y + dy > $canvas[0].height - ballRadius || y + dy < ballRadius) {
 			dy = -dy;
 		}
@@ -437,13 +455,13 @@ var twoPlayerMode = {
 		}
 
 //***** PADDLE ONE COLLISION DETECTION *****//
-		if (y + dy > paddleOneY 
-			&& y + dy < paddleOneY + paddleWidth
-			&& x === $canvas[0].width - ballRadius - paddleHeight) {
-			console.log('paddleOne hit');
+		if (y > paddleOneY 
+			&& y < paddleOneY + paddleWidth
+			&& x === $canvas[0].width - ballRadius) {
 			dx = -dx;
+			console.log('paddleOne hit');
 		}
-		else if (x === $canvas[0].width - ballRadius) {
+		else if (x + dx > $canvas[0].width - ballRadius) {
 			playerOneLives--;
 			if (playerOneLives < 1) {
 				dx = -dx;
@@ -453,14 +471,35 @@ var twoPlayerMode = {
 			}
 		}
 
+		// if ((x > paddleX && x < paddleX + paddleWidth)
+		// && (y === $canvas[0].height - ballRadius)) {
+		// 		dy = -dy;
+		// }
+		// else if (y + dy > $canvas[0].height - ballRadius) {
+		// 	lives --;
+		// 	if (lives < 1) {
+		// // Reloads the game if you lose all of your lives.
+		// 		dy = -dy;
+		// 		onePlayerMode.gameOver();
+		// 	}
+
+		// 	else {
+		// // Returns ball and paddle to the starting point.
+		// 		x = $canvas[0].width/2;
+		// 		y = $canvas[0].height - 30;
+		// 		dx = 2;
+		// 		dy = -2;
+		// 		paddleX = ($canvas[0].width - paddleWidth)/2;
+		// 	}
+		// }
+
 //***** PADDLE TWO COLLISION DETECTION *****//
-		if (y + dy > paddleTwoY 
-			&& y + dy < paddleTwoY + paddleWidth
-			&& x === 0 + ballRadius + paddleHeight) {
+		if (y > paddleTwoY && y < paddleTwoY + paddleWidth
+			&& x === 0 + ballRadius) {
 			console.log('paddleTwo hit');
 			dx = -dx;
 		}
-		else if (x === 0 + ballRadius) {
+		else if (x + dx > 0 + ballRadius) {
 			playerTwoLives--;
 			if (playerTwoLives < 1) {
 				dx = -dx;
@@ -469,6 +508,7 @@ var twoPlayerMode = {
 				setTimeout(reloadPage, 3000);
 			}
 		}
+
 
 //***** PLAYER ONE CONTROLS *****//
 		if (leftPressed && paddleOneY > 0) {
@@ -490,9 +530,6 @@ var twoPlayerMode = {
 		x += dx;
 		y += dy;
 	}
-
-
-	window.setInterval(draw, frameDuration);
 }
 
 
