@@ -137,6 +137,13 @@ var onePlayerMode = {
 		onePlayerMode.draw();
 	},
 
+	mouseHandler: function(e) {
+		var relativeX = e.clientX - canvas.offsetLeft;
+		if (relativeX > 0 && relativeX < canvas.width) {
+			paddleX = relativeX - paddleWidth/2;
+		}
+	},
+
 	runGame: function() {
 // Sets the interval at which to run the draw function.
 		run = window.setInterval(onePlayerMode.draw, frameDuration);
@@ -346,6 +353,8 @@ var onePlayerMode = {
 			window.setInterval(onePlayerMode.draw, frameDuration);
 			gamePaused === false;
 		}
+
+		$('#canvas').mousemove(onePlayerMode.mouseHandler);
 		x += dx;
 		y += dy;
 	}	
